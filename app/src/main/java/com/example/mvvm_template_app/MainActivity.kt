@@ -1,0 +1,110 @@
+package com.example.mvvm_template_app
+
+import android.os.Bundle
+import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
+import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.mvvm_template_app.adapters.RecyclerAdapter
+import com.example.mvvm_template_app.databinding.ActivityMainBinding
+import com.example.mvvm_template_app.models.NicePlace
+import com.example.mvvm_template_app.viewmodels.MainActivityViewModel
+import com.example.mvvm_template_app.viewmodels.UserViewModel
+import kotlinx.android.synthetic.main.activity_main.view.*
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.launch
+
+
+class MainActivity : AppCompatActivity() {
+    private lateinit var mAdapter: RecyclerAdapter
+    private lateinit var mMainActivityViewModel: MainActivityViewModel
+    private lateinit var mUserViewModel: UserViewModel
+
+
+    private lateinit var mainBinding : ActivityMainBinding
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        mainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+
+        mMainActivityViewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
+        mMainActivityViewModel.init()
+
+        mMainActivityViewModel.getNicePlaces()?.observe(this,
+            Observer<List<NicePlace>> {
+                mAdapter.notifyDataSetChanged()
+            })
+
+        mMainActivityViewModel.getIsUpdating()?.observe(this,
+            Observer {
+                if(it!!){
+                    showProgressBar()
+                } else{
+                hideProgressBar()
+                    mainBinding.customRecyclerView
+                        .smoothScrollToPosition(
+                            mMainActivityViewModel
+                                .getNicePlaces()!!.value!!.size -1)
+                }
+            })
+
+
+        mainBinding.fab.setOnClickListener {
+            onAddButtonClicked()
+        }
+
+        initializeRecyclerView()
+
+        /*mUserViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
+
+        mUserViewModel.user.observe(this, Observer {
+            println("DEBUG: ${it}")
+        })
+
+        mUserViewModel.setUserId("1")*/
+    }
+
+    private val handler = CoroutineExceptionHandler { _, exception ->
+        println("Exception thrown: $exception")
+    }
+
+    private fun onAddButtonClicked() {
+        val job = CoroutineScope(IO).launch(handler) {
+            mMainActivityViewModel.addNewValue(
+                NicePlace(
+                    "https://i.imgur.com/ZcLLrkY.jpg",
+                    "Washington"
+                )
+            )
+        }
+    }
+
+
+    private fun initializeRecyclerView() {
+        mAdapter = RecyclerAdapter(this, mMainActivityViewModel.getNicePlaces()?.value!!)
+        val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(this@MainActivity)
+        mainBinding.root.customRecyclerView.layoutManager = layoutManager
+        mainBinding.root.customRecyclerView.adapter = mAdapter
+    }
+
+    private fun showProgressBar() {
+        mainBinding.progressBar.visibility = VISIBLE
+    }
+
+    private fun hideProgressBar() {
+        mainBinding.progressBar.visibility = GONE
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        //mUserViewModel.cancelJobs()
+    }
+}
