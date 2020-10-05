@@ -12,10 +12,11 @@ import com.bumptech.glide.Glide
 import com.example.mvvm_template_app.R
 import com.example.mvvm_template_app.databinding.ItemNicePlaceBinding
 import com.example.mvvm_template_app.models.NicePlace
+import com.example.mvvm_template_app.models.User
 
 internal class RecyclerAdapter(
     private val context: Context,
-    private val dataList: List<NicePlace>
+    private val dataList: List<User>?
 ) : RecyclerView.Adapter<RecyclerAdapter.CustomViewHolder>() {
 
     internal inner class CustomViewHolder(binding: ItemNicePlaceBinding) :
@@ -35,19 +36,19 @@ internal class RecyclerAdapter(
     }
 
     override fun getItemCount(): Int {
-        return dataList.size
+        return dataList!!.size
     }
 
     override fun onBindViewHolder(holder: CustomViewHolder, position: Int) {
-        val item = dataList[position]
-        holder.title.text = item.title
+        val item = this!!.dataList!![position]
+        holder.title.text = item.name
 
-        Glide
+        /*Glide
             .with(context)
             .load(item.imageUrl)
             .centerCrop()
             .placeholder(R.drawable.ic_launcher_background)
             .fallback(R.drawable.ic_launcher_background)
-            .into(holder.image)
+            .into(holder.image)*/
     }
 }

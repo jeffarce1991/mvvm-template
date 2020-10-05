@@ -1,7 +1,6 @@
 package com.example.mvvm_template_app
 
 import android.os.Bundle
-import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import androidx.appcompat.app.AppCompatActivity
@@ -12,8 +11,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mvvm_template_app.adapters.RecyclerAdapter
 import com.example.mvvm_template_app.databinding.ActivityMainBinding
-import com.example.mvvm_template_app.models.NicePlace
-import com.example.mvvm_template_app.viewmodels.MainActivityViewModel
+import com.example.mvvm_template_app.models.User
+import com.example.mvvm_template_app.viewmodels.MainViewModel
 import com.example.mvvm_template_app.viewmodels.UserViewModel
 import kotlinx.android.synthetic.main.activity_main.view.*
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -24,7 +23,7 @@ import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private lateinit var mAdapter: RecyclerAdapter
-    private lateinit var mMainActivityViewModel: MainActivityViewModel
+    private lateinit var viewModel: MainViewModel
     private lateinit var mUserViewModel: UserViewModel
 
 
@@ -35,15 +34,15 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         mainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
-        mMainActivityViewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
-        mMainActivityViewModel.init()
+        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        viewModel.init()
 
-        mMainActivityViewModel.getNicePlaces()?.observe(this,
-            Observer<List<NicePlace>> {
-                mAdapter.notifyDataSetChanged()
+        viewModel.getUsers()?.observe(this,
+            Observer<MutableList<User>> {
+                initializeRecyclerView(it)
             })
 
-        mMainActivityViewModel.getIsUpdating()?.observe(this,
+        viewModel.getIsUpdating()?.observe(this,
             Observer {
                 if(it!!){
                     showProgressBar()
@@ -51,8 +50,8 @@ class MainActivity : AppCompatActivity() {
                 hideProgressBar()
                     mainBinding.customRecyclerView
                         .smoothScrollToPosition(
-                            mMainActivityViewModel
-                                .getNicePlaces()!!.value!!.size -1)
+                            viewModel
+                                .getUsers()!!.value!!.size -1)
                 }
             })
 
@@ -61,7 +60,6 @@ class MainActivity : AppCompatActivity() {
             onAddButtonClicked()
         }
 
-        initializeRecyclerView()
 
         /*mUserViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
 
@@ -78,18 +76,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun onAddButtonClicked() {
         val job = CoroutineScope(IO).launch(handler) {
-            mMainActivityViewModel.addNewValue(
-                NicePlace(
-                    "https://i.imgur.com/ZcLLrkY.jpg",
-                    "Washington"
-                )
+            viewModel.addNewValue(
+                User()
             )
         }
     }
 
 
-    private fun initializeRecyclerView() {
-        mAdapter = RecyclerAdapter(this, mMainActivityViewModel.getNicePlaces()?.value!!)
+    private fun initializeRecyclerView(users: MutableList<User>) {
+        mAdapter = RecyclerAdapter(this, users)
         val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(this@MainActivity)
         mainBinding.root.customRecyclerView.layoutManager = layoutManager
         mainBinding.root.customRecyclerView.adapter = mAdapter
@@ -105,6 +100,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        //mUserViewModel.cancelJobs()
+        viewModel.cancelJobs()
     }
 }
