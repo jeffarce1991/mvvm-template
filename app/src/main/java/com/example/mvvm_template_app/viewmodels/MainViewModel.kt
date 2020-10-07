@@ -1,16 +1,20 @@
 package com.example.mvvm_template_app.viewmodels
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.room.Room
 import com.example.mvvm_template_app.models.User
 import com.example.mvvm_template_app.repositories.MainRepository
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.delay
+import com.example.mvvm_template_app.room.MyDatabase
+import com.example.mvvm_template_app.room.UsersDao
 
 
-class MainViewModel: ViewModel() {
+class MainViewModel(application: Application): AndroidViewModel(application){
 
+
+    var myDatabase: MyDatabase = MyDatabase.getDatabase(application)
 
     private val handler = CoroutineExceptionHandler { _, exception ->
         println("Exception thrown: $exception")
@@ -22,6 +26,8 @@ class MainViewModel: ViewModel() {
         mUsers = MainRepository.getUsers()
         println("debug : MainViewModel ${mUsers!!.value}")
 
+    init {
+        mUsers = MainRepository(myDatabase.userDao()).getUsers()
     }
 
     suspend fun  addNewValue(user: User) {
