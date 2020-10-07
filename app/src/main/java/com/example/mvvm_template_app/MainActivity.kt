@@ -12,13 +12,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mvvm_template_app.adapters.RecyclerAdapter
 import com.example.mvvm_template_app.databinding.ActivityMainBinding
 import com.example.mvvm_template_app.models.User
+import com.example.mvvm_template_app.models.UserDto
 import com.example.mvvm_template_app.viewmodels.MainViewModel
 import com.example.mvvm_template_app.viewmodels.UserViewModel
 import kotlinx.android.synthetic.main.activity_main.view.*
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
@@ -35,7 +32,7 @@ class MainActivity : AppCompatActivity() {
         mainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-        viewModel.init()
+
 
         viewModel.getUsers()?.observe(this,
             Observer<MutableList<User>> {
@@ -57,7 +54,7 @@ class MainActivity : AppCompatActivity() {
 
 
         mainBinding.fab.setOnClickListener {
-            onAddButtonClicked()
+            viewModel.addNewValue(User())
         }
 
 
@@ -69,19 +66,6 @@ class MainActivity : AppCompatActivity() {
 
         mUserViewModel.setUserId("1")*/
     }
-
-    private val handler = CoroutineExceptionHandler { _, exception ->
-        println("Exception thrown: $exception")
-    }
-
-    private fun onAddButtonClicked() {
-        val job = CoroutineScope(IO).launch(handler) {
-            viewModel.addNewValue(
-                User()
-            )
-        }
-    }
-
 
     private fun initializeRecyclerView(users: MutableList<User>) {
         mAdapter = RecyclerAdapter(this, users)
