@@ -1,42 +1,38 @@
 package com.example.mvvm_template_app.models
 
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
-/*
-
-data class User (
-    @Expose
-    @SerializedName("email")
-    val email: String? = null,
-
-    @Expose
-    @SerializedName("username")
-    val username: String? = null,
-
-    @Expose
-    @SerializedName("image")
-    val image: String? = null
-    ) {
-        override fun toString(): String {
-            return "User(email=$email, username=$username, image=$image)"
-        }
 
 
-}
-*/
+@Entity(tableName = "users")
+class User(
 
+    @PrimaryKey(autoGenerate = false)
+    @ColumnInfo(name = "id")
+    var id: Int,
 
-data class User(
+    @ColumnInfo(name = "address")
     val address: Address,
+
+    @ColumnInfo(name = "company")
     val company: Company,
+
+    @ColumnInfo(name = "email")
     val email: String,
-    val id: Int,
+
+    @ColumnInfo(name = "name")
     val name: String,
+    @ColumnInfo(name = "phone")
     val phone: String,
+    @ColumnInfo(name = "username")
     val username: String,
+    @ColumnInfo(name = "website")
     val website: String
 ) {
-    constructor(): this(Address(), Company(), "sample@gmail.com", -1, "", "","",    "")
+    constructor(): this(-1, Address(), Company(), "sample@gmail.com", "Squall Leonheart", "","",    "")
 }
 
 data class Address(
