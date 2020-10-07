@@ -9,11 +9,13 @@ import com.example.mvvm_template_app.models.User
 import com.example.mvvm_template_app.repositories.MainRepository
 import com.example.mvvm_template_app.room.MyDatabase
 import com.example.mvvm_template_app.room.UsersDao
+import kotlinx.coroutines.*
 
 
 class MainViewModel(application: Application): AndroidViewModel(application){
 
 
+    var job: CompletableJob? = null
     var myDatabase: MyDatabase = MyDatabase.getDatabase(application)
 
     private val handler = CoroutineExceptionHandler { _, exception ->
@@ -22,20 +24,23 @@ class MainViewModel(application: Application): AndroidViewModel(application){
 
     private var mUsers: MutableLiveData<MutableList<User>>? = null
     private var mIsUpdating: MutableLiveData<Boolean> = MutableLiveData()
-    fun init() {
-        mUsers = MainRepository.getUsers()
-        println("debug : MainViewModel ${mUsers!!.value}")
-
     init {
         mUsers = MainRepository(myDatabase.userDao()).getUsers()
     }
 
-    suspend fun  addNewValue(user: User) {
-            delay(1000)
-            val currentPlaces: MutableList<User>? = mUsers!!.value
-            currentPlaces!!.add(user)
-            mUsers!!.postValue(currentPlaces)
-            mIsUpdating.postValue(false)
+    fun  addNewValue(user: User) {
+        mIsUpdating.postValue(true)
+        job = Job()
+        job?.let {
+            CoroutineScope(Dispatchers.IO + it).launch(handler) {
+                delay(1000)
+                val users: MutableList<User>? = mUsers!!.value
+                users!!.add(user)
+                mUsers!!.postValue(users)
+                mIsUpdating.postValue(false)
+                it.complete()
+            }
+        }
 
     }
 
@@ -48,6 +53,6 @@ class MainViewModel(application: Application): AndroidViewModel(application){
     }
 
     fun cancelJobs() {
-        MainRepository.cancelJobs()
+        MainRepository(myDatabase.userDao()).cancelJobs()
     }
 }
