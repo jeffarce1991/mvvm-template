@@ -15,9 +15,11 @@ import com.example.mvvm_template_app.models.User
 import com.example.mvvm_template_app.models.UserDto
 import com.example.mvvm_template_app.viewmodels.MainViewModel
 import com.example.mvvm_template_app.viewmodels.UserViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.view.*
 
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var mAdapter: RecyclerAdapter
     private lateinit var viewModel: MainViewModel
