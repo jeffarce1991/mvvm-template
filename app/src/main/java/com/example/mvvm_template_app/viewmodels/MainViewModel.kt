@@ -1,9 +1,11 @@
 package com.example.mvvm_template_app.viewmodels
 
 import android.app.Application
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.room.Room
 import com.example.mvvm_template_app.models.User
 import com.example.mvvm_template_app.repositories.MainRepository
@@ -12,11 +14,14 @@ import com.example.mvvm_template_app.room.UsersDao
 import kotlinx.coroutines.*
 
 
-class MainViewModel(application: Application): AndroidViewModel(application){
+class MainViewModel
+@ViewModelInject
+constructor(
+    private val mainRepository: MainRepository
+): ViewModel(){
 
 
     var job: CompletableJob? = null
-    var myDatabase: MyDatabase = MyDatabase.getDatabase(application)
 
     private val handler = CoroutineExceptionHandler { _, exception ->
         println("Exception thrown: $exception")
@@ -25,7 +30,7 @@ class MainViewModel(application: Application): AndroidViewModel(application){
     private var mUsers: MutableLiveData<MutableList<User>>? = null
     private var mIsUpdating: MutableLiveData<Boolean> = MutableLiveData()
     init {
-        mUsers = MainRepository(myDatabase.userDao()).getUsers()
+        mUsers = mainRepository.getUsers()
     }
 
     fun  addNewValue(user: User) {
@@ -53,6 +58,6 @@ class MainViewModel(application: Application): AndroidViewModel(application){
     }
 
     fun cancelJobs() {
-        MainRepository(myDatabase.userDao()).cancelJobs()
+        mainRepository.cancelJobs()
     }
 }
