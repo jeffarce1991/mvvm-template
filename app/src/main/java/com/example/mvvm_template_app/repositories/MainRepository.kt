@@ -12,7 +12,9 @@ import java.net.UnknownHostException
 /*
 * Singleton pattern
 * */
-class MainRepository(private val usersDao: UsersDao) {
+class MainRepository(
+    private val usersDao: UsersDao
+) {
 
     private var networkMapper: NetworkMapper = NetworkMapper()
 
