@@ -1,6 +1,8 @@
 package com.example.mvvm_template_app.di
 
+import com.example.mvvm_template_app.api.UsersApi
 import com.example.mvvm_template_app.repositories.MainRepository
+import com.example.mvvm_template_app.repositories.MainRepositoryImpl
 import com.example.mvvm_template_app.room.UsersDao
 import dagger.Module
 import dagger.Provides
@@ -14,7 +16,10 @@ object RepositoryModule {
 
     @Singleton
     @Provides
-    fun provideMainRepository(usersDao: UsersDao): MainRepository {
-        return MainRepository(usersDao)
+    fun provideMainRepository(usersDao: UsersDao,
+                              usersApi: UsersApi): MainRepository {
+        return MainRepositoryImpl(
+            usersDao,
+            usersApi)
     }
 }
