@@ -1,23 +1,18 @@
 package com.example.mvvm_template_app.viewmodels
 
-import android.app.Application
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.room.Room
 import com.example.mvvm_template_app.models.User
-import com.example.mvvm_template_app.repositories.MainRepository
-import com.example.mvvm_template_app.room.MyDatabase
-import com.example.mvvm_template_app.room.UsersDao
+import com.example.mvvm_template_app.repositories.MainRepositoryImpl
 import kotlinx.coroutines.*
 
 
 class MainViewModel
 @ViewModelInject
 constructor(
-    private val mainRepository: MainRepository
+    private val mainRepositoryImpl: MainRepositoryImpl
 ): ViewModel(){
 
 
@@ -30,7 +25,7 @@ constructor(
     private var mUsers: MutableLiveData<MutableList<User>>? = null
     private var mIsUpdating: MutableLiveData<Boolean> = MutableLiveData()
     init {
-        mUsers = mainRepository.getUsers()
+        mUsers = mainRepositoryImpl.getUsers()
     }
 
     fun  addNewValue(user: User) {
@@ -58,6 +53,6 @@ constructor(
     }
 
     fun cancelJobs() {
-        mainRepository.cancelJobs()
+        mainRepositoryImpl.cancelJobs()
     }
 }

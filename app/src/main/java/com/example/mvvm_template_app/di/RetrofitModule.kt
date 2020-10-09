@@ -1,10 +1,7 @@
 package com.example.mvvm_template_app.di
 
-import com.example.mvvm_template_app.api.ApiService
-import com.example.mvvm_template_app.models.User
-import com.example.mvvm_template_app.models.UserDto
+import com.example.mvvm_template_app.api.UsersApi
 import com.example.mvvm_template_app.utils.Constants
-import com.example.mvvm_template_app.utils.EntityMapper
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -13,7 +10,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.create
 import javax.inject.Singleton
 
 @Module
@@ -38,9 +34,9 @@ object RetrofitModule {
 
     @Singleton
     @Provides
-    fun provideApiService(retrofit: Retrofit.Builder): ApiService {
+    fun provideApiService(retrofit: Retrofit.Builder): UsersApi {
         return retrofit
             .build()
-            .create(ApiService::class.java)
+            .create(UsersApi::class.java)
     }
 }
