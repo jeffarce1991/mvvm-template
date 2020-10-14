@@ -1,11 +1,14 @@
 package com.example.mvvm_template_app.repositories
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.mvvm_template_app.api.UsersApi
 import com.example.mvvm_template_app.models.User
 import com.example.mvvm_template_app.room.UsersDao
 import com.example.mvvm_template_app.utils.NetworkMapper
 import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
 import java.net.UnknownHostException
 import javax.inject.Inject
 
@@ -38,6 +41,7 @@ class MainRepositoryImpl
 
                         try {
                             val remoteUsers = usersApi.getUsers()
+                            println("debug: Remote Users $remoteUsers")
 
                             for(dto in remoteUsers){
                                 usersDao.insert(networkMapper.mapFromDto(dto))
@@ -45,35 +49,17 @@ class MainRepositoryImpl
 
                             withContext(Dispatchers.Main) {
                                 value = networkMapper.mapFromDtoList(remoteUsers) as MutableList<User>
-                                println("debug: $value")
                                 theJob.complete()
                             }
                         } catch(e: Exception) {
                             if (e is UnknownHostException) {
                                 val cachedUsers = usersDao.get()
-                                println("debug: cache users $cachedUsers")
-
+                                println("debug: Cached Users $cachedUsers")
                                 withContext(Dispatchers.Main) {
                                     value = cachedUsers
-                                    println("debug: $cachedUsers")
                                     theJob.complete()
                                 }
                             }
-                        }
-                    }
-
-                    theJob.invokeOnCompletion { throwable ->
-                        if (throwable != null) {
-                            println("debug: Throwable thrown: $throwable")
-                                CoroutineScope(Dispatchers.IO + theJob).launch {
-                                    val users = usersDao.get()
-                                    withContext(Dispatchers.Main) {
-                                        value = users
-                                        //networkMapper.mapFromDtoList(userDtos) as MutableList<User>
-                                        println("debug: $users")
-                                        theJob.complete()
-                                    }
-                                }
                         }
                     }
                 }
@@ -81,9 +67,27 @@ class MainRepositoryImpl
         }
     }
 
-    fun getUsersLocally() {
 
+    override fun getById(id: Int): LiveData<User> {
+        job = Job()
+        return object: LiveData<User>(){
+            override fun onActive() {
+                super.onActive()
+                job?.let{ theJob ->
+                    CoroutineScope(IO + theJob).launch {
+                        val user = usersDao.findById(id)
+                        println("debug: User ${user.company.name}")
+                        withContext(Main){
+                            value = user
+                            theJob.complete()
+                        }
+                    }
+                }
+            }
+        }
     }
+
+
     fun cancelJobs() {
         job?.cancel()
     }

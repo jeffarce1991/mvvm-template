@@ -3,6 +3,7 @@ package com.example.mvvm_template_app.viewmodels
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import com.example.mvvm_template_app.models.User
 import com.example.mvvm_template_app.repositories.MainRepositoryImpl
@@ -12,9 +13,10 @@ import kotlinx.coroutines.*
 class MainViewModel
 @ViewModelInject
 constructor(
-    private val mainRepositoryImpl: MainRepositoryImpl
+    private val mainRepository: MainRepositoryImpl
 ): ViewModel(){
 
+    private val _userId: MutableLiveData<Int> = MutableLiveData()
 
     var job: CompletableJob? = null
 
@@ -23,9 +25,24 @@ constructor(
     }
 
     private var mUsers: MutableLiveData<MutableList<User>>? = null
+    private var mUser: MutableLiveData<User>? = null
     private var mIsUpdating: MutableLiveData<Boolean> = MutableLiveData()
     init {
-        mUsers = mainRepositoryImpl.getUsers()
+        mUsers = mainRepository.getUsers()
+    }
+
+
+    val user: LiveData<User> = Transformations
+        .switchMap(_userId){
+            mainRepository.getById(it)
+        }
+
+    fun setUserId(userId: Int){
+        val update = userId
+        if (_userId.value == update) {
+            return
+        }
+        _userId.value = update
     }
 
     fun  addNewValue(user: User) {
@@ -48,11 +65,12 @@ constructor(
         return mUsers
     }
 
+
     fun getIsUpdating(): LiveData<Boolean?>? {
         return mIsUpdating
     }
 
     fun cancelJobs() {
-        mainRepositoryImpl.cancelJobs()
+        mainRepository.cancelJobs()
     }
 }

@@ -14,4 +14,7 @@ interface UsersDao {
 
     @Query("SELECT * FROM users")
     suspend fun get(): MutableList<User>
+
+    @Query("SELECT * FROM users WHERE id LIKE :id LIMIT 1")
+    suspend fun findById(id: Int): User
 }

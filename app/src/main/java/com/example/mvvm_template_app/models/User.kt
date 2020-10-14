@@ -37,12 +37,12 @@ class User(
 
 data class Address(
     val city: String,
-    val geo: Geo,
     val street: String,
     val suite: String,
-    val zipcode: String
+    val zipcode: String,
+    val geo: Geo
 ) {
-    constructor(): this("", Geo(), "", "", "")
+    constructor(): this("", "", "", "", Geo())
 }
 
 data class Company(
