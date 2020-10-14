@@ -12,16 +12,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.mvvm_template_app.adapters.RecyclerAdapter
 import com.example.mvvm_template_app.databinding.ActivityMainBinding
 import com.example.mvvm_template_app.models.User
-import com.example.mvvm_template_app.models.UserDto
 import com.example.mvvm_template_app.viewmodels.MainViewModel
-import com.example.mvvm_template_app.viewmodels.UserViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.view.*
 
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var mAdapter: RecyclerAdapter
     private lateinit var viewModel: MainViewModel
-    private lateinit var mUserViewModel: UserViewModel
 
 
     private lateinit var mainBinding : ActivityMainBinding
@@ -56,15 +55,6 @@ class MainActivity : AppCompatActivity() {
         mainBinding.fab.setOnClickListener {
             viewModel.addNewValue(User())
         }
-
-
-        /*mUserViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
-
-        mUserViewModel.user.observe(this, Observer {
-            println("DEBUG: ${it}")
-        })
-
-        mUserViewModel.setUserId("1")*/
     }
 
     private fun initializeRecyclerView(users: MutableList<User>) {

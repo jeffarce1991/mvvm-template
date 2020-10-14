@@ -1,22 +1,22 @@
 package com.example.mvvm_template_app.viewmodels
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.room.Room
+import androidx.lifecycle.ViewModel
 import com.example.mvvm_template_app.models.User
-import com.example.mvvm_template_app.repositories.MainRepository
-import com.example.mvvm_template_app.room.MyDatabase
-import com.example.mvvm_template_app.room.UsersDao
+import com.example.mvvm_template_app.repositories.MainRepositoryImpl
 import kotlinx.coroutines.*
 
 
-class MainViewModel(application: Application): AndroidViewModel(application){
+class MainViewModel
+@ViewModelInject
+constructor(
+    private val mainRepositoryImpl: MainRepositoryImpl
+): ViewModel(){
 
 
     var job: CompletableJob? = null
-    var myDatabase: MyDatabase = MyDatabase.getDatabase(application)
 
     private val handler = CoroutineExceptionHandler { _, exception ->
         println("Exception thrown: $exception")
@@ -25,7 +25,7 @@ class MainViewModel(application: Application): AndroidViewModel(application){
     private var mUsers: MutableLiveData<MutableList<User>>? = null
     private var mIsUpdating: MutableLiveData<Boolean> = MutableLiveData()
     init {
-        mUsers = MainRepository(myDatabase.userDao()).getUsers()
+        mUsers = mainRepositoryImpl.getUsers()
     }
 
     fun  addNewValue(user: User) {
@@ -53,6 +53,6 @@ class MainViewModel(application: Application): AndroidViewModel(application){
     }
 
     fun cancelJobs() {
-        MainRepository(myDatabase.userDao()).cancelJobs()
+        mainRepositoryImpl.cancelJobs()
     }
 }

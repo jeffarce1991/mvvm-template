@@ -4,7 +4,7 @@ import com.example.mvvm_template_app.models.UserDto
 import retrofit2.http.GET
 import retrofit2.http.Path
 
-interface ApiService {
+interface UsersApi {
 
     @GET("placeholder/user/{userId}")
     suspend fun getUser(

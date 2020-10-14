@@ -27,13 +27,29 @@ data class User (
 
 
 data class UserDto(
+    @Expose
+    @SerializedName("id")
     val id: Int,
+    @Expose
+    @SerializedName("address")
     val address: Address,
+    @Expose
+    @SerializedName("company")
     val company: Company,
+    @Expose
+    @SerializedName("email")
     val email: String,
+    @Expose
+    @SerializedName("name")
     val name: String,
+    @Expose
+    @SerializedName("phone")
     val phone: String,
+    @Expose
+    @SerializedName("username")
     val username: String,
+    @Expose
+    @SerializedName("website")
     val website: String
 ) {
     constructor(): this(-1,Address(), Company(), "sample@gmail.com",  "Squall Leonheart", "","",    "")
