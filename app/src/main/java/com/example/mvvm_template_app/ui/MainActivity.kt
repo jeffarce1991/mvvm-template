@@ -1,4 +1,4 @@
-package com.example.mvvm_template_app
+package com.example.mvvm_template_app.ui
 
 import android.os.Bundle
 import android.view.View.GONE
@@ -9,19 +9,19 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.mvvm_template_app.R
 import com.example.mvvm_template_app.adapters.RecyclerAdapter
 import com.example.mvvm_template_app.databinding.ActivityMainBinding
 import com.example.mvvm_template_app.models.User
-import com.example.mvvm_template_app.models.UserDto
 import com.example.mvvm_template_app.viewmodels.MainViewModel
-import com.example.mvvm_template_app.viewmodels.UserViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.view.*
 
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var mAdapter: RecyclerAdapter
     private lateinit var viewModel: MainViewModel
-    private lateinit var mUserViewModel: UserViewModel
 
 
     private lateinit var mainBinding : ActivityMainBinding
@@ -29,7 +29,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        mainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        mainBinding = DataBindingUtil.setContentView(this,
+            R.layout.activity_main
+        )
 
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
@@ -56,22 +58,13 @@ class MainActivity : AppCompatActivity() {
         mainBinding.fab.setOnClickListener {
             viewModel.addNewValue(User())
         }
-
-
-        /*mUserViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
-
-        mUserViewModel.user.observe(this, Observer {
-            println("DEBUG: ${it}")
-        })
-
-        mUserViewModel.setUserId("1")*/
     }
 
     private fun initializeRecyclerView(users: MutableList<User>) {
-        mAdapter = RecyclerAdapter(this, users)
+        /*mAdapter = RecyclerAdapter(this, users)
         val layoutManager: RecyclerView.LayoutManager = LinearLayoutManager(this@MainActivity)
         mainBinding.root.customRecyclerView.layoutManager = layoutManager
-        mainBinding.root.customRecyclerView.adapter = mAdapter
+        mainBinding.root.customRecyclerView.adapter = mAdapter*/
     }
 
     private fun showProgressBar() {

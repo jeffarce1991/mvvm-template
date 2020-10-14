@@ -1,31 +1,48 @@
 package com.example.mvvm_template_app.viewmodels
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.room.Room
+import androidx.lifecycle.Transformations
+import androidx.lifecycle.ViewModel
 import com.example.mvvm_template_app.models.User
-import com.example.mvvm_template_app.repositories.MainRepository
-import com.example.mvvm_template_app.room.MyDatabase
-import com.example.mvvm_template_app.room.UsersDao
+import com.example.mvvm_template_app.repositories.MainRepositoryImpl
 import kotlinx.coroutines.*
 
 
-class MainViewModel(application: Application): AndroidViewModel(application){
+class MainViewModel
+@ViewModelInject
+constructor(
+    private val mainRepository: MainRepositoryImpl
+): ViewModel(){
 
+    private val _userId: MutableLiveData<Int> = MutableLiveData()
 
     var job: CompletableJob? = null
-    var myDatabase: MyDatabase = MyDatabase.getDatabase(application)
 
     private val handler = CoroutineExceptionHandler { _, exception ->
         println("Exception thrown: $exception")
     }
 
     private var mUsers: MutableLiveData<MutableList<User>>? = null
+    private var mUser: MutableLiveData<User>? = null
     private var mIsUpdating: MutableLiveData<Boolean> = MutableLiveData()
     init {
-        mUsers = MainRepository(myDatabase.userDao()).getUsers()
+        mUsers = mainRepository.getUsers()
+    }
+
+
+    val user: LiveData<User> = Transformations
+        .switchMap(_userId){
+            mainRepository.getById(it)
+        }
+
+    fun setUserId(userId: Int){
+        val update = userId
+        if (_userId.value == update) {
+            return
+        }
+        _userId.value = update
     }
 
     fun  addNewValue(user: User) {
@@ -48,11 +65,12 @@ class MainViewModel(application: Application): AndroidViewModel(application){
         return mUsers
     }
 
+
     fun getIsUpdating(): LiveData<Boolean?>? {
         return mIsUpdating
     }
 
     fun cancelJobs() {
-        MainRepository(myDatabase.userDao()).cancelJobs()
+        mainRepository.cancelJobs()
     }
 }
