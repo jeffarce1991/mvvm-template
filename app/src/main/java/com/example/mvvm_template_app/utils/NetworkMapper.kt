@@ -1,7 +1,6 @@
 package com.example.mvvm_template_app.utils
 
-import com.example.mvvm_template_app.models.UserDto
-import com.example.mvvm_template_app.models.User
+import com.example.mvvm_template_app.models.*
 
 class NetworkMapper:
     EntityMapper<UserDto, User> {
@@ -9,8 +8,19 @@ class NetworkMapper:
     override fun mapFromDto(dto: UserDto): User {
         return User(
             dto.id,
-            dto.address,
-            dto.company,
+            Address(
+                dto.address.city,
+                dto.address.street,
+                dto.address.suite,
+                dto.address.zipcode,
+                Geo(dto.address.geo.lat,
+                    dto.address.geo.lng)
+            ),
+            Company(
+                dto.company.bs,
+                dto.company.catchPhrase,
+                dto.company.name
+            ),
             dto.email,
             dto.name,
             dto.phone,
@@ -22,8 +32,19 @@ class NetworkMapper:
     override fun mapToDto(model: User): UserDto {
         return UserDto(
             model.id,
-            model.address,
-            model.company,
+            AddressDto(
+                model.address.city,
+                model.address.street,
+                model.address.suite,
+                model.address.zipcode,
+                GeoDto(model.address.geo.lat,
+                    model.address.geo.lng)
+            ),
+            CompanyDto(
+                model.company.bs,
+                model.company.catchPhrase,
+                model.company.name
+            ),
             model.email,
             model.name,
             model.phone,
