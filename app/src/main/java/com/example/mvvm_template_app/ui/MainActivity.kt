@@ -13,6 +13,8 @@ import com.example.mvvm_template_app.R
 import com.example.mvvm_template_app.adapters.RecyclerAdapter
 import com.example.mvvm_template_app.databinding.ActivityMainBinding
 import com.example.mvvm_template_app.models.User
+import com.example.mvvm_template_app.utils.hide
+import com.example.mvvm_template_app.utils.show
 import com.example.mvvm_template_app.viewmodels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.view.*
@@ -68,11 +70,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showProgressBar() {
-        mainBinding.progressBar.visibility = VISIBLE
+        mainBinding.progressBar.show()
     }
 
     private fun hideProgressBar() {
-        mainBinding.progressBar.visibility = GONE
+        mainBinding.progressBar.hide()
     }
 
     override fun onDestroy() {
