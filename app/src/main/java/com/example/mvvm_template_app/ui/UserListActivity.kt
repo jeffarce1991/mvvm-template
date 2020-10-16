@@ -1,29 +1,25 @@
 package com.example.mvvm_template_app.ui
 
-import android.content.Intent
 import android.os.Bundle
-import androidx.core.widget.NestedScrollView
-import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.RecyclerView
-import androidx.appcompat.widget.Toolbar
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.core.widget.NestedScrollView
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.mvvm_template_app.R
 import com.example.mvvm_template_app.adapters.RecyclerAdapter
-import com.example.mvvm_template_app.databinding.ActivityMainBinding
 import com.example.mvvm_template_app.databinding.ActivityUserListBinding
-
 import com.example.mvvm_template_app.models.User
+import com.example.mvvm_template_app.utils.hide
+import com.example.mvvm_template_app.utils.show
 import com.example.mvvm_template_app.viewmodels.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.user_list.view.*
+import java.security.AccessController.getContext
+
 
 /**
  * An activity representing a list of Pings. This activity
@@ -67,24 +63,26 @@ class UserListActivity : AppCompatActivity() {
             // activity should be in two-pane mode.
             twoPane = true
         }
-
+        
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+
+        initializeRecyclerView()
+
         viewModel.getUsers()?.observe(this,
             Observer<MutableList<User>> {
-                setupRecyclerView(findViewById(R.id.user_list), it)
+                mAdapter.updateList(it)
+                viewModel.setIsUpdating(false)
             })
 
 
         viewModel.getIsUpdating()?.observe(this,
             Observer {
                 if(it!!){
-                    //showProgressBar()
+                    showProgressBar()
                 } else{
-                    //hideProgressBar()
-                    binding.frameLayout.user_list
-                        .smoothScrollToPosition(
-                            viewModel
-                                .getUsers()!!.value!!.size -1)
+                    hideProgressBar()
+                    binding.userList.smoothScrollToPosition(
+                        viewModel.getUsers()!!.value!!.size -1)
                 }
             })
 
@@ -92,6 +90,15 @@ class UserListActivity : AppCompatActivity() {
         binding.fab.setOnClickListener {
             viewModel.addNewValue(User())
         }
+
+    }
+
+    private fun showProgressBar() {
+        binding.progressBar.show()
+    }
+
+    private fun hideProgressBar() {
+        binding.progressBar.hide()
     }
 
     private fun setupToolbar() {
@@ -100,12 +107,9 @@ class UserListActivity : AppCompatActivity() {
         toolbar.title = title
     }
 
-    private fun setupRecyclerView(recyclerView: RecyclerView, users: MutableList<User>) {
-        recyclerView.adapter =
-            RecyclerAdapter(
-                this,
-                users,
-                twoPane
-            )
+    private fun initializeRecyclerView() {
+        binding.userList.layoutManager = LinearLayoutManager(this)
+        mAdapter = RecyclerAdapter(this, listOf(), twoPane)
+        binding.userList.adapter = mAdapter
     }
 }
