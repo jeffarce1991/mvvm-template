@@ -28,7 +28,9 @@ constructor(
     private var mUser: MutableLiveData<User>? = null
     private var mIsUpdating: MutableLiveData<Boolean> = MutableLiveData()
     init {
+        mIsUpdating.postValue(true)
         mUsers = mainRepository.getUsers()
+
     }
 
 
@@ -69,6 +71,11 @@ constructor(
     fun getIsUpdating(): LiveData<Boolean?>? {
         return mIsUpdating
     }
+
+    fun setIsUpdating(isUpdating: Boolean) {
+        mIsUpdating.postValue(isUpdating)
+    }
+
 
     fun cancelJobs() {
         mainRepository.cancelJobs()
