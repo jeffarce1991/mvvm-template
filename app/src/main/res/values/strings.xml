@@ -3,4 +3,5 @@
     <string name="content_description" />
     <string name="title_user_list">Users</string>
     <string name="title_user_detail">User Detail</string>
+    <string name="cancel">Cancel</string>
 </resources>
