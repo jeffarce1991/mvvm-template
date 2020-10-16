@@ -1,18 +1,14 @@
 package com.example.mvvm_template_app.adapters
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mvvm_template_app.R
-import com.example.mvvm_template_app.databinding.ItemNicePlaceBinding
 import com.example.mvvm_template_app.databinding.UserListContentBinding
 import com.example.mvvm_template_app.models.User
 import com.example.mvvm_template_app.ui.UserDetailActivity
@@ -21,7 +17,7 @@ import com.example.mvvm_template_app.ui.UserListActivity
 
 internal class RecyclerAdapter(
     private val parentActivity: UserListActivity,
-    private val values: List<User>,
+    private var mUsers: List<User>,
     private val twoPane: Boolean
 ) : RecyclerView.Adapter<RecyclerAdapter.CustomViewHolder>() {
 
@@ -50,6 +46,11 @@ internal class RecyclerAdapter(
         }
     }
 
+    fun updateList(users: List<User>) {
+        mUsers = users
+        notifyDataSetChanged()
+    }
+
     internal inner class CustomViewHolder(binding: UserListContentBinding) :
         RecyclerView.ViewHolder(binding.root) {
         val idView: TextView = binding.idText
@@ -67,10 +68,10 @@ internal class RecyclerAdapter(
     }
 
 
-    override fun getItemCount() = values.size
+    override fun getItemCount() = mUsers.size
 
     override fun onBindViewHolder(holder: CustomViewHolder, position: Int) {
-        val item = values[position]
+        val item = mUsers[position]
         holder.idView.text = item.id.toString()
         holder.contentView.text = item.name
 
